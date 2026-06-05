@@ -1,12 +1,12 @@
 import React from 'react'
-
+import { RouterProvider } from 'react-router'
+import { router } from './app.routes'
+import { AuthProvider } from './features/auth/auth.context.jsx'
 const App = () => {
   return (
-    <div className='b1 h-full w-full bg-blue-700'>
-        <h1 class="text-3xl font-bold underline">
-      Hello world!
-    </h1>
-  </div>
+    <AuthProvider>
+      <RouterProvider router={router} />
+    </AuthProvider>
   )
 }
 
