@@ -19,7 +19,6 @@ const Register = () => {
                 email,
                 password
             })
-
             navigate('/dashboard')
         } catch (error) {
             console.error(error)
