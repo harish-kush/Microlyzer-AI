@@ -6,7 +6,7 @@ const GuestRoute = ({ children }) => {
 
   if (loading) return <div>Loading...</div>;
 
-  return !user ? children : <Navigate to="/dashboard" />;
+  return !user ? children : <Navigate to="/" />;
 };
 
 export default GuestRoute;

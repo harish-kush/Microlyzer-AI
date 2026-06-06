@@ -19,7 +19,7 @@ const Register = () => {
                 email,
                 password
             })
-            navigate('/dashboard')
+            navigate('/')
         } catch (error) {
             console.error(error)
             alert('Registration failed')
