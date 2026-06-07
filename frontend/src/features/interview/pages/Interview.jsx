@@ -3,16 +3,10 @@ import { useInterview } from '../hooks/useInterview.js'
 import { useParams } from 'react-router'
 import { logout } from "../../auth/services/auth.api.js";
 import { motion, AnimatePresence } from 'framer-motion'
+import { useNavigate } from 'react-router';
 
-const handleLogout = async () => {
-    try {
-        await logout();
 
-        navigate("/login");
-    } catch (err) {
-        console.log(err);
-    }
-};
+
 
 const NAV_ITEMS = [
     {
@@ -225,10 +219,21 @@ const Interview = () => {
     const [activeNav, setActiveNav] = useState('technical')
     const { report, getReportById, loading, getResumePdf } = useInterview()
     const { interviewId } = useParams()
+    const navigate = useNavigate();
 
     useEffect(() => {
         if (interviewId) getReportById(interviewId)
     }, [interviewId])
+
+    const handleLogout = async () => {
+        try {
+            await logout();
+
+            navigate("/login");
+        } catch (err) {
+            console.log(err);
+        }
+    };
 
     if (loading || !report) {
         return (
