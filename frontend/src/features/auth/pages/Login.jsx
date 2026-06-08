@@ -31,7 +31,6 @@ const Login = () => {
     return (
         <main className="min-h-screen bg-[#0a0a0f] flex items-center justify-center relative overflow-hidden">
 
-            {/* Background grid */}
             <div
                 className="absolute inset-0 opacity-[0.03]"
                 style={{
@@ -40,19 +39,15 @@ const Login = () => {
                 }}
             />
 
-            {/* Glow orbs */}
             <div className="absolute top-[-20%] left-[-10%] w-[600px] h-[600px] bg-violet-600/20 rounded-full blur-[120px] pointer-events-none" />
             <div className="absolute bottom-[-20%] right-[-10%] w-[500px] h-[500px] bg-indigo-600/15 rounded-full blur-[120px] pointer-events-none" />
 
-            {/* Card */}
             <div className="relative z-10 w-full max-w-md mx-4">
 
-                {/* Top accent bar */}
                 <div className="h-px bg-gradient-to-r from-transparent via-violet-500 to-transparent mb-px" />
 
                 <div className="bg-[#111118]/90 backdrop-blur-xl border border-white/[0.06] rounded-2xl p-10 shadow-2xl shadow-black/60">
 
-                    {/* Logo mark */}
                     <div className="flex items-center gap-3 mb-10">
                         <div className="w-8 h-8 rounded-lg bg-violet-600 flex items-center justify-center shadow-lg shadow-violet-600/30">
                             <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
@@ -62,7 +57,6 @@ const Login = () => {
                         <span className="text-white font-semibold tracking-tight text-lg">Microlyzer AI</span>
                     </div>
 
-                    {/* Heading */}
                     <div className="mb-8">
                         <h1 className="text-2xl font-semibold text-white tracking-tight mb-1">
                             Welcome back
@@ -70,10 +64,8 @@ const Login = () => {
                         <p className="text-zinc-500 text-sm">Sign in to continue to your workspace</p>
                     </div>
 
-                    {/* Form */}
                     <form onSubmit={handleSubmit} className="space-y-4">
 
-                        {/* Email */}
                         <div className="space-y-1.5">
                             <label
                                 htmlFor="email"
@@ -100,7 +92,6 @@ const Login = () => {
                             </div>
                         </div>
 
-                        {/* Password */}
                         <div className="space-y-1.5">
                             <div className="flex items-center justify-between">
                                 <label
@@ -152,7 +143,6 @@ const Login = () => {
                             </div>
                         </div>
 
-                        {/* Submit */}
                         <button
                             type="submit"
                             className="group relative w-full mt-2 py-3.5 rounded-xl bg-violet-600 hover:bg-violet-500 text-white text-sm font-medium tracking-wide transition-all duration-200 shadow-lg shadow-violet-600/25 hover:shadow-violet-500/30 overflow-hidden"
@@ -163,8 +153,6 @@ const Login = () => {
 
                     </form>
 
-
-                    {/* Register link */}
                     <p className="mt-8 text-center text-zinc-600 text-xs">
                         Don't have an account?{' '}
                         <Link
@@ -177,7 +165,6 @@ const Login = () => {
 
                 </div>
 
-                {/* Bottom accent bar */}
                 <div className="h-px bg-gradient-to-r from-transparent via-indigo-500/40 to-transparent mt-px" />
             </div>
         </main>
