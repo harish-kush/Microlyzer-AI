@@ -1,5 +1,5 @@
 {
-  "name": "auth-service",
+  "name": "interview-service",
   "version": "1.0.0",
   "main": "server.js",
   "scripts": {

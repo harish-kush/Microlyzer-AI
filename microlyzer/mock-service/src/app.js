@@ -16,6 +16,6 @@ app.use(
   })
 );
 
-app.use("/api/mock", mockInterviewRouter);
+app.use("/", mockInterviewRouter);
 
 module.exports = app;

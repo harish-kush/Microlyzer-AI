@@ -15,6 +15,6 @@ app.use(
   }),
 );
 
-app.use("/api/auth", authRouter);
+app.use("/", authRouter);
 
 module.exports = app;

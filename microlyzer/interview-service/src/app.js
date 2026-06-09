@@ -16,6 +16,6 @@ app.use(
   })
 );
 
-app.use("/api/interview", interviewRouter);
+app.use("/", interviewRouter);
 
 module.exports = app;
