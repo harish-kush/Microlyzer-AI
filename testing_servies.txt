@@ -128,25 +128,3 @@ Req/Bytes counts sampled once per second.
 
 0 2xx responses, 38493 non 2xx responses
 39k requests in 20.1s, 56.9 MB read
-
-
-
-
-auth-service/
-├── src
-│   ├── config
-│   │   └── database.js
-│   ├── controllers
-│   │   └── auth.controller.js
-│   ├── middlewares
-│   │   └── auth.middleware.js
-│   ├── models
-│   │   └── user.model.js
-│   ├── routes
-│   │   └── auth.routes.js
-│   ├── services
-│   │   └── auth.service.js (agar hai)
-│   └── app.js
-├── server.js
-├── .env
-└── package.json
