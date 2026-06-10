@@ -11,13 +11,6 @@ app.use(
   })
 );
 
-// Gateway Health Check
-app.get("/health", (req, res) => {
-  res.json({
-    service: "api-gateway",
-    status: "healthy",
-  });
-});
 
 // Auth Service
 app.use(
