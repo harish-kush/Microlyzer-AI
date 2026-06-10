@@ -35,22 +35,79 @@ const interviewReportSchema = z.object({
 async function generateInterviewReport({ resume, selfDescription, jobDescription }) {
 
 
-    const prompt = `Generate an interview report for a candidate with the following details:
-                        Resume: ${resume}
-                        Self Description: ${selfDescription}
-                        Job Description: ${jobDescription}
-`
+    const prompt = `
+Return ONLY valid JSON.
+
+{
+  "title": "Frontend Software Engineer",
+  "matchScore": 85,
+  "technicalQuestions": [
+    {
+      "question": "string",
+      "intention": "string",
+      "answer": "string"
+    }
+  ],
+  "behavioralQuestions": [
+    {
+      "question": "string",
+      "intention": "string",
+      "answer": "string"
+    }
+  ],
+  "skillGaps": [
+    {
+      "skill": "string",
+      "severity": "low"
+    }
+  ],
+  "preparationPlan": [
+    {
+      "day": 1,
+      "focus": "string",
+      "tasks": ["task1", "task2"]
+    }
+  ]
+}
+
+IMPORTANT:
+- technicalQuestions must be an array of objects.
+- behavioralQuestions must be an array of objects.
+- skillGaps must be an array of objects.
+- preparationPlan must be an array of objects.
+- title is mandatory.
+- matchScore must be between 0 and 100.
+- Return ONLY JSON.
+
+Resume:
+${resume}
+
+Self Description:
+${selfDescription}
+
+Job Description:
+${jobDescription}
+`;
 
     const response = await ai.models.generateContent({
-        model: "gemini-3-flash-preview",
+        model: "gemini-2.5-flash",
         contents: prompt,
         config: {
-            responseMimeType: "application/json",
-            responseSchema: zodToJsonSchema(interviewReportSchema),
+            responseMimeType: "application/json"
         }
     })
 
-    return JSON.parse(response.text)
+    const parsed = JSON.parse(response.text);
+
+console.log(
+    JSON.stringify(parsed, null, 2)
+);
+
+interviewReportSchema.parse(parsed);
+
+return parsed;
+
+    
 
 
 }

@@ -3,12 +3,14 @@ const { generateInterviewReport, generateResumePdf } = require("../services/ai.s
 const interviewReportModel = require("../models/interviewReport.model.js")
 
 
-
-
 /**
  * @description Controller to generate interview report based on user self description, resume and job description.
  */
 async function generateInterViewReportController(req, res) {
+
+    console.log("FILE =>", req.file);
+    console.log("BODY =>", req.body);
+
 
     const resumeContent = await (new pdfParse.PDFParse(Uint8Array.from(req.file.buffer))).getText()
     const { selfDescription, jobDescription } = req.body
@@ -18,6 +20,9 @@ async function generateInterViewReportController(req, res) {
         selfDescription,
         jobDescription
     })
+
+    console.log("AI RESPONSE:");
+    console.log(JSON.stringify(interViewReportByAi, null, 2));
 
     const interviewReport = await interviewReportModel.create({
         user: req.user.id,

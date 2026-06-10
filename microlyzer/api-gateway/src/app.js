@@ -31,7 +31,7 @@ app.use(
     target: "http://localhost:3002",
     changeOrigin: true,
     pathRewrite: {
-      "^/api/interview": "/api/interview",
+      "^/api/interview": "",
     },
   })
 );

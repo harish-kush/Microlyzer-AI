@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const api = axios.create({
-    baseURL: "http://localhost:3000",
+    baseURL: "http://localhost:5000",
     withCredentials: true,
 })
 
@@ -11,16 +11,19 @@ const api = axios.create({
  */
 export const generateInterviewReport = async ({ jobDescription, selfDescription, resumeFile }) => {
 
+
+    console.log("resumeFile =>", resumeFile);
+    console.log("typeof =>", typeof resumeFile);
+    console.log("instanceof File =>", resumeFile instanceof File);
+
     const formData = new FormData()
     formData.append("jobDescription", jobDescription)
     formData.append("selfDescription", selfDescription)
     formData.append("resume", resumeFile)
 
-    const response = await api.post("/api/interview/", formData, {
-        headers: {
-            "Content-Type": "multipart/form-data"
-        }
-    })
+    
+
+    const response = await api.post("/api/interview/", formData)
 
     return response.data
 

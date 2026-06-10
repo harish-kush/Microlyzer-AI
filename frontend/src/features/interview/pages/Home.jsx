@@ -29,6 +29,7 @@ const Home = () => {
 
   const handleGenerateReport = async () => {
     const resumeFile = resumeInputRef.current.files[0];
+    console.log("HOME FILE =>", resumeFile);
     const data = await generateReport({
       jobDescription,
       selfDescription,
