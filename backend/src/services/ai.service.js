@@ -32,6 +32,92 @@ const interviewReportSchema = z.object({
     title: z.string().describe("The title of the job for which the interview report is generated"),
 })
 
+function extractTitleFromJobDescription(jobDescription) {
+    if (!jobDescription) return "Targeted Role"
+
+    const titleMatch = jobDescription.match(/^(?:\*\*|\*|\s)*(?:Job Title|Title|Role|Position):\s*(.+)$/im)
+    if (titleMatch?.[1]) return titleMatch[1].trim()
+
+    const lines = jobDescription
+        .split(/\r?\n/)
+        .map((line) => line.trim())
+        .filter(Boolean)
+
+    return lines[0] || "Targeted Role"
+}
+
+function asArray(value) {
+    if (Array.isArray(value)) return value
+    if (value === undefined || value === null || value === "") return []
+    return [ value ]
+}
+
+function textFrom(value, fallback) {
+    if (typeof value === "string") return value.trim() || fallback
+    if (typeof value === "number") return String(value)
+    return fallback
+}
+
+function normalizeQuestion(value) {
+    if (typeof value === "string") {
+        return {
+            question: value,
+            intention: "Assess the candidate's relevant experience and communication.",
+            answer: "Prepare a concise answer using your project experience, tradeoffs, and measurable outcomes.",
+        }
+    }
+
+    return {
+        question: textFrom(value?.question, "Question unavailable"),
+        intention: textFrom(value?.intention, "Assess the candidate's relevant experience and communication."),
+        answer: textFrom(value?.answer, "Prepare a concise answer using your project experience, tradeoffs, and measurable outcomes."),
+    }
+}
+
+function normalizeSkillGap(value) {
+    const allowedSeverities = new Set([ "low", "medium", "high" ])
+    const severity = textFrom(value?.severity, "medium").toLowerCase()
+
+    return {
+        skill: textFrom(value?.skill ?? value, "Relevant skill gap"),
+        severity: allowedSeverities.has(severity) ? severity : "medium",
+    }
+}
+
+function normalizePreparationDay(value, index) {
+    if (typeof value === "string") {
+        return {
+            day: index + 1,
+            focus: value,
+            tasks: [ value ],
+        }
+    }
+
+    const focus = textFrom(value?.focus, `Preparation day ${index + 1}`)
+    const tasks = asArray(value?.tasks)
+        .map((task) => textFrom(task, "Review the focus area"))
+        .filter(Boolean)
+
+    return {
+        day: Number.isFinite(Number(value?.day)) ? Number(value.day) : index + 1,
+        focus,
+        tasks: tasks.length ? tasks : [ focus ],
+    }
+}
+
+function normalizeInterviewReport(report, jobDescription) {
+    const matchScore = Number(report?.matchScore)
+
+    return interviewReportSchema.parse({
+        title: textFrom(report?.title, extractTitleFromJobDescription(jobDescription)),
+        matchScore: Number.isFinite(matchScore) ? Math.min(100, Math.max(0, matchScore)) : 0,
+        technicalQuestions: asArray(report?.technicalQuestions).map(normalizeQuestion),
+        behavioralQuestions: asArray(report?.behavioralQuestions).map(normalizeQuestion),
+        skillGaps: asArray(report?.skillGaps).map(normalizeSkillGap),
+        preparationPlan: asArray(report?.preparationPlan).map(normalizePreparationDay),
+    })
+}
+
 async function generateInterviewReport({ resume, selfDescription, jobDescription }) {
 
 
@@ -50,7 +136,10 @@ async function generateInterviewReport({ resume, selfDescription, jobDescription
         }
     })
 
-    return JSON.parse(response.text)
+    const parsedResponse = JSON.parse(response.text)
+    const report = Array.isArray(parsedResponse) ? parsedResponse[0] : parsedResponse
+
+    return normalizeInterviewReport(report, jobDescription)
 
 
 }
@@ -113,4 +202,4 @@ async function generateResumePdf({ resume, selfDescription, jobDescription }) {
 
 }
 
-module.exports = { generateInterviewReport, generateResumePdf }
+module.exports = { generateInterviewReport, generateResumePdf, normalizeInterviewReport }

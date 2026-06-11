@@ -1,0 +1,15 @@
+{
+  "name": "microlyzer",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "dev": "concurrently \"cd auth-service && npm run dev\" \"cd interview-service && npm run dev\" \"cd mock-service && npm run dev\" \"cd api-gateway && npm run dev\""
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "devDependencies": {
+    "concurrently": "^10.0.3"
+  }
+}
