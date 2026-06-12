@@ -5,6 +5,8 @@ const connectToDB = require("./src/config/database");
 
 connectToDB();
 
-app.listen(3001, () => {
-  logger.info("Auth Service running on port 3001");
+const PORT = process.env.PORT || 3001;
+
+app.listen(PORT, () => {
+  logger.info(`Auth Service running on port ${PORT}`);
 });

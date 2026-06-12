@@ -6,6 +6,8 @@ const logger = require("./src/config/logger");
 
 connectToDB();
 
-app.listen(3002, () => {
-  logger.info("Interview Service running on port 3002");
+const PORT = process.env.PORT || 3002;
+
+app.listen(PORT, () => {
+  logger.info(`Interview Service running on port ${PORT}`);
 });
