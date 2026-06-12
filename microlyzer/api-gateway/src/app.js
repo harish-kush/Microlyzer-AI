@@ -8,9 +8,9 @@ const { createProxyMiddleware } = require("http-proxy-middleware");
 const app = express();
 
 const services = {
-  auth: process.env.AUTH_SERVICE_URL ,
-  interview: process.env.INTERVIEW_SERVICE_URL,
-  mock: process.env.MOCK_SERVICE_URL ,
+  auth: process.env.AUTH_SERVICE_URL || "http://localhost:3001",
+  interview: process.env.INTERVIEW_SERVICE_URL || "http://localhost:3002",
+  mock: process.env.MOCK_SERVICE_URL || "http://localhost:3003",
 };
 
 const allowedOrigins = [
@@ -46,6 +46,12 @@ function createServiceProxy(serviceName) {
     timeout: 60000,
     proxyTimeout: 60000,
     on: {
+      proxyRes(proxyRes) {
+        delete proxyRes.headers["access-control-allow-origin"];
+        delete proxyRes.headers["access-control-allow-credentials"];
+        delete proxyRes.headers["access-control-allow-methods"];
+        delete proxyRes.headers["access-control-allow-headers"];
+      },
       error(err, req, res) {
         if (res.headersSent) {
           return;
