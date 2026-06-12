@@ -243,77 +243,6 @@ Microlyzer-AI/
 
 ---
 
-## 🚀 Quick Start
-
-### Prerequisites
-
-- **Node.js** 18+ & npm 9+
-- **MongoDB** (local or MongoDB Atlas)
-- **Google Generative AI API Key** ([Get here](https://aistudio.google.com/app/apikeys))
-- **Render Account** (for deployment)
-
-### Installation
-
-#### 1. Clone Repository
-
-```bash
-git clone https://github.com/yourusername/Microlyzer-AI.git
-cd Microlyzer-AI
-```
-
-#### 2. Backend Setup
-
-```bash
-cd backend
-
-# Install dependencies
-npm install
-
-# Create .env file
-cat > .env << EOF
-# Server Configuration
-PORT=3000
-NODE_ENV=development
-
-# Database
-MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/microlyzer
-
-# Authentication
-JWT_SECRET=your_super_secret_jwt_key
-JWT_EXPIRES_IN=7d
-
-# Google AI
-GOOGLE_GENAI_API_KEY=your_google_api_key
-
-# Frontend
-FRONTEND_URL=http://localhost:5173
-EOF
-
-# Start development server
-npm run dev
-```
-
-**Backend** will run on `http://localhost:3000`
-
-#### 3. Frontend Setup
-
-```bash
-cd ../frontend
-
-# Install dependencies
-npm install
-
-# Create environment configuration (if needed)
-# Update src/config/api.js with backend URL
-
-# Start development server
-npm run dev
-```
-
-**Frontend** will run on `http://localhost:5173`
-
----
-
 ## 📚 API Documentation
 
 ### Base URL
@@ -432,52 +361,6 @@ Response: 200 OK
   "score": 8.5
 }
 ```
-
----
-
-## 🛠️ Development
-
-### Running Both Frontend & Backend
-
-```bash
-# Terminal 1 - Backend
-cd backend
-npm run dev
-
-# Terminal 2 - Frontend
-cd frontend
-npm run dev
-```
-
-### Running Microservices Architecture
-
-```bash
-cd microlyzer
-
-# Install root dependencies
-npm install
-
-# Run all services concurrently
-npm run dev
-
-# Check service health
-npm run health
-```
-
-### Code Quality
-
-```bash
-# Frontend linting
-cd frontend
-npm run lint
-
-# Build production
-npm run build
-```
-
-### Testing
-
-Refer to [testing_services.txt](testing_servies.txt) for detailed testing procedures.
 
 ---
 
@@ -752,28 +635,6 @@ This project is licensed under the **ISC License** — see [LICENSE](LICENSE) fi
 
 ---
 
-## 🙋 Support & Contact
-
-- **Issues** — GitHub Issues
-- **Email** — support@microlyzer.dev
-- **Documentation** — See [testing_services.txt](testing_servies.txt)
-
----
-
-## 📅 Roadmap
-
-- [ ] Mobile app (React Native)
-- [ ] Video interview feature with recording
-- [ ] Live interviewer feedback with WebRTC
-- [ ] Interview performance analytics dashboard
-- [ ] Integration with LinkedIn and job boards
-- [ ] Multilingual support
-- [ ] Advanced skill gap analysis with ML
-- [ ] Interview difficulty levels
-- [ ] Community interview Q&A forum
-
----
-
 ## 🎓 Learning Resources
 
 - [Express.js Documentation](https://expressjs.com/)
@@ -786,8 +647,6 @@ This project is licensed under the **ISC License** — see [LICENSE](LICENSE) fi
 
 <div align="center">
 
-**Made with ❤️ by the Microlyzer-AI Team**
-
-⭐ If this project helped you, please consider giving it a star!
+**Made by Harish Kushwaha**
 
 </div>
