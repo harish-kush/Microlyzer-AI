@@ -100,9 +100,6 @@ const Login = () => {
                                 >
                                     Password
                                 </label>
-                                <a href="#" className="text-xs text-violet-400 hover:text-violet-300 transition-colors">
-                                    Forgot password?
-                                </a>
                             </div>
                             <div className={`relative flex items-center rounded-xl border transition-all duration-200 bg-white/[0.03] ${focused === 'password' ? 'border-violet-500/60 shadow-[0_0_0_3px_rgba(139,92,246,0.08)]' : 'border-white/[0.07]'}`}>
                                 <div className="pl-4 pr-3 text-zinc-600">
