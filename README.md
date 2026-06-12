@@ -1,114 +1,313 @@
-# GenAI Interview Assistant
+# 🚀 Microlyzer AI
 
-A full-stack interview preparation web application with AI-powered report generation and resume PDF creation.
+Microlyzer AI is a scalable AI-powered microservices platform designed to provide secure authentication, user management, and AI-driven analysis through a distributed architecture.
 
-## Project Structure
+Built using modern web technologies and industry-standard backend practices, the system follows a microservices architecture with an API Gateway acting as the single entry point for all client requests.
 
-- `Backend/`
-  - Node.js + Express API
-  - MongoDB with Mongoose
-  - Google GenAI integration for interview reports and resume generation
-  - Puppeteer used to render PDF resumes
-- `Frontend/`
-  - React + Vite application
-  - Client-side auth state and protected routes
-  - Axios calls to backend API
+---
 
-## Key Features
+## 🌟 Features
 
-- User registration, login, logout, and `get-me`
-- Generate interview reports from:
-  - uploaded resume PDF
-  - self description
-  - job description
-- Store interview reports for the authenticated user
-- View saved interview reports
-- Generate a tailored resume PDF for a saved report
+### Authentication & Authorization
+- Secure JWT-based authentication
+- Access Token & Refresh Token mechanism
+- Protected routes
+- Role-based access support
+- Persistent login sessions
 
-## Backend
+### User Management
+- User profile management
+- Account information retrieval
+- Secure user data handling
 
-### Tech stack
+### AI Processing
+- AI-powered analysis services
+- Dedicated AI microservice
+- Scalable architecture for future AI integrations
 
-- Node.js
-- Express
-- MongoDB / Mongoose
-- JWT authentication with cookies
-- Multer for resume uploads
-- Google GenAI (`@google/genai`)
-- Puppeteer for PDF generation
-- Zod schema validation
+### API Gateway
+- Centralized request routing
+- Service abstraction
+- Unified API access
+- Improved maintainability
 
-### Important files
+### Security
+- Password hashing using bcrypt
+- HTTP-only cookies
+- CORS protection
+- Input validation
+- Secure token management
 
-- `Backend/server.js` - starts the Express server and connects to MongoDB
-- `Backend/src/app.js` - configures middleware and routes
-- `Backend/src/routes/auth.routes.js` - auth endpoints
-- `Backend/src/routes/interview.routes.js` - interview endpoints
-- `Backend/src/controllers/auth.controller.js` - register/login/logout/get-me
-- `Backend/src/controllers/interview.controller.js` - report generation and resume PDF
-- `Backend/src/services/ai.service.js` - AI prompts and PDF rendering
-- `Backend/src/config/database.js` - MongoDB connection
+---
 
+# 🏗️ Architecture
 
-### Run backend
+```text
+                    ┌─────────────┐
+                    │   Frontend  │
+                    │  (Next.js)  │
+                    └──────┬──────┘
+                           │
+                           ▼
+                 ┌──────────────────┐
+                 │   API Gateway    │
+                 └────────┬─────────┘
+                          │
+        ┌─────────────────┼─────────────────┐
+        ▼                 ▼                 ▼
 
-```bash
-cd Backend
-npm install
-npm run dev
+ ┌─────────────┐   ┌─────────────┐   ┌─────────────┐
+ │ Auth Service│   │ User Service│   │ AI Service  │
+ └──────┬──────┘   └──────┬──────┘   └──────┬──────┘
+        │                 │                 │
+        └─────────────────┴─────────────────┘
+                          │
+                          ▼
+                   MongoDB Atlas
 ```
 
-The backend listens on `http://localhost:3000`.
+---
+
+# 🛠️ Tech Stack
 
 ## Frontend
-
-### Tech stack
-
+- Next.js
 - React
-- Vite
-- Axios
-- React Router
-- Sass
+- TypeScript
+- Tailwind CSS
 
-### Important files
+## Backend
+- Node.js
+- Express.js
+- TypeScript
 
-- `Frontend/src/App.jsx` - root app provider wrapping auth and interview contexts
-- `Frontend/src/app.routes.jsx` - route definitions
-- `Frontend/src/features/auth/...` - auth pages, context, and API service
-- `Frontend/src/features/interview/...` - interview pages, context, and API service
+## Database
+- MongoDB Atlas
+- Mongoose
 
-### Run frontend
+## Authentication
+- JWT
+- bcrypt
+
+## Deployment
+- Vercel (Frontend)
+- Render (Backend Services)
+- MongoDB Atlas
+
+---
+
+# 📂 Microservices
+
+## 1. API Gateway
+
+Responsibilities:
+
+- Route incoming requests
+- Forward requests to appropriate services
+- Centralized API access
+- Service communication
+
+---
+
+## 2. Auth Service
+
+Responsibilities:
+
+- User Registration
+- User Login
+- JWT Generation
+- Token Validation
+- Refresh Token Handling
+
+---
+
+## 3. User Service
+
+Responsibilities:
+
+- User Profile Management
+- User Information Retrieval
+- User Data Operations
+
+---
+
+## 4. AI Service
+
+Responsibilities:
+
+- AI Processing
+- Analysis Generation
+- Future AI Feature Expansion
+
+---
+
+# 🔐 Authentication Flow
+
+1. User logs in.
+2. Auth Service validates credentials.
+3. JWT Access Token is generated.
+4. Refresh Token is issued.
+5. Protected APIs verify tokens.
+6. Gateway forwards authenticated requests to services.
+
+---
+
+# ⚡ Local Setup
+
+## Clone Repository
 
 ```bash
-cd Frontend
+git clone <repository-url>
+cd microlyzer-ai
+```
+
+## Install Dependencies
+
+For each service:
+
+```bash
 npm install
+```
+
+## Environment Variables
+
+Create a `.env` file for each service.
+
+Example:
+
+```env
+PORT=5000
+
+MONGODB_URI=your_mongodb_uri
+
+JWT_ACCESS_SECRET=your_access_secret
+
+JWT_REFRESH_SECRET=your_refresh_secret
+```
+
+---
+
+## Run Services
+
+### Auth Service
+
+```bash
 npm run dev
 ```
 
-The frontend runs at `http://localhost:5173` and communicates with `http://localhost:3000`.
+### User Service
 
-## API Endpoints
+```bash
+npm run dev
+```
 
-### Auth
+### AI Service
 
-- `POST /api/auth/register` - register a new user
-- `POST /api/auth/login` - login and set auth cookie
-- `GET /api/auth/logout` - logout and blacklist token
-- `GET /api/auth/get-me` - get current authenticated user
+```bash
+npm run dev
+```
 
-### Interview
+### API Gateway
 
-- `POST /api/interview/` - generate interview report (`multipart/form-data` with `resume`, `selfDescription`, `jobDescription`)
-- `GET /api/interview/` - fetch all interview reports for user
-- `GET /api/interview/report/:interviewId` - fetch single report
-- `POST /api/interview/resume/pdf/:interviewReportId` - generate resume PDF for a report
+```bash
+npm run dev
+```
 
-## Notes
+---
 
-- Frontend auth uses cookies with `withCredentials: true`
-- Resume upload limit is `3MB` in the backend
-- AI generation uses Gemini preview model and validates the response schema with Zod
+# 📡 API Endpoints
 
-## Author
+## Authentication
 
-- Harish Kushwaha
+```http
+POST /api/auth/register
+```
+
+```http
+POST /api/auth/login
+```
+
+```http
+POST /api/auth/logout
+```
+
+```http
+GET /api/auth/get-me
+```
+
+---
+
+## Users
+
+```http
+GET /api/users/profile
+```
+
+```http
+PUT /api/users/profile
+```
+
+---
+
+## AI
+
+```http
+POST /api/ai/analyze
+```
+
+---
+
+# 🚀 Deployment
+
+| Service | Platform |
+|----------|----------|
+| Frontend | Vercel |
+| API Gateway | Render |
+| Auth Service | Render |
+| User Service | Render |
+| AI Service | Render |
+| Database | MongoDB Atlas |
+
+---
+
+# ⚠️ Important Note Regarding Deployment
+
+This project is deployed using Render's free tier for backend services.
+
+As Render free-tier instances automatically spin down after periods of inactivity, the first request after inactivity may experience:
+
+- Increased response time
+- Cold start delays
+- Temporary service unavailability
+
+In some cases, a service may take a few seconds to wake up before responding.
+
+This behavior is expected in the free-tier environment and does not reflect the actual performance of the application in a production-grade deployment.
+
+For production environments, dedicated always-on instances, load balancing, health checks, caching, and container orchestration solutions such as Docker, Kubernetes, AWS ECS, or Google Cloud Run are recommended.
+
+---
+
+# 🔮 Future Improvements
+
+- Redis Caching
+- Service Discovery
+- Circuit Breakers
+- Rate Limiting
+- Centralized Logging
+- Monitoring & Observability
+- Kubernetes Deployment
+- CI/CD Pipelines
+- Load Balancing
+- Event-Driven Communication
+
+---
+
+# 👨‍💻 Author
+
+Harish Kushwaha
+
+Electronics & Communication Engineering
+MANIT Bhopal
+
+---
