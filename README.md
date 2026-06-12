@@ -25,14 +25,16 @@
 
 ## 🏗️ Architecture
 
-### System Design
+### Before — Monolithic Architecture
+
+The original monolithic architecture (single Express.js backend):
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
 │                      Frontend (React 19)                     │
 │              (Vite, TailwindCSS, Framer Motion)             │
 └────────────────┬────────────────────────────────────────────┘
-                 │ CORS-enabled HTTP/REST
+        │ CORS-enabled HTTP/REST
 ┌────────────────▼────────────────────────────────────────────┐
 │              Monolithic Backend (Express.js)                │
 │  ┌─────────────┬─────────────┬──────────────────────────┐   │
@@ -50,31 +52,71 @@
 │  │  Service    │  Service    │     Service              │   │
 │  └──────┬──────┴──────┬──────┴─────────────┬────────────┘   │
 └─────────┼──────────────┼────────────────────┼────────────────┘
-          │              │                    │
-     ┌────▼──────────────▼────────────────────▼────┐
-     │    MongoDB (Mongoose ODM)                   │
-     │  ┌──────────────────────────────────────┐   │
-     │  │ Collections: users, interviews,      │   │
-     │  │ reports, mock sessions, tokens       │   │
-     │  └──────────────────────────────────────┘   │
-     └──────────────────────────────────────────────┘
-          │
-     ┌────▼──────────────────────────────────────┐
-     │  Google Generative AI API (Gemini)       │
-     │  • Resume Analysis                       │
-     │  • Question Generation                   │
-     │  • Report Synthesis                      │
-     └──────────────────────────────────────────┘
+    │              │                    │
+  ┌────▼──────────────▼────────────────────▼────┐
+  │    MongoDB (Mongoose ODM)                   │
+  │  ┌──────────────────────────────────────┐   │
+  │  │ Collections: users, interviews,      │   │
+  │  │ reports, mock sessions, tokens       │   │
+  │  └──────────────────────────────────────┘   │
+  └──────────────────────────────────────────────┘
+    │
+  ┌────▼──────────────────────────────────────┐
+  │  Google Generative AI API (Gemini)       │
+  │  • Resume Analysis                       │
+  │  • Question Generation                   │
+  │  • Report Synthesis                      │
+  └──────────────────────────────────────────┘
 ```
 
-### Microservices Architecture (Scalable)
+### After — Microservices Architecture (Scalable)
 
-The `microlyzer/` directory contains a microservices implementation with:
+The refactored microservices architecture:
 
-- **API Gateway** (Port 5000) — Single entry point for all services
-- **Auth Service** (Port 3001) — User authentication and token management
-- **Interview Service** (Port 3002) — Interview report generation
-- **Mock Service** (Port 3003) — Mock interview session management
+```
+┌─────────────────────────────────────────────────────────────┐
+│                      Frontend (React 19)                   │
+│              (Vite, TailwindCSS, Framer Motion)            │
+└────────────────┬───────────────────────────────────────────┘
+     │
+     │ HTTPS / REST API
+     ▼
+┌─────────────────────────────────────────────────────────────┐
+│                     API Gateway Service                    │
+│                                                           │
+│ • Request Routing                                         │
+│ • Authentication Middleware                               │
+│ • CORS Handling                                           │
+│ • Rate Limiting (Future)                                  │
+│ • Centralized Entry Point                                 │
+└──────────────┬──────────────┬──────────────┬───────────────┘
+         │              │              │
+         ▼              ▼              ▼
+
+┌──────────────────┐ ┌──────────────────┐ ┌──────────────────┐
+│   Auth Service   │ │ Interview Service│ │   Mock Service   │
+├──────────────────┤ ├──────────────────┤ ├──────────────────┤
+│ Auth Routes      │ │ Interview Routes │ │ Mock Routes      │
+│ Auth Controller  │ │ Interview Ctrl   │ │ Mock Controller  │
+│ JWT Handling     │ │ Resume Upload    │ │ Session Mgmt     │
+│ Token Validation │ │ Report Storage   │ │ Question Gen     │
+│ User Mgmt        │ │ Resume PDF Gen   │ │ Answer Analysis  │
+└────────┬─────────┘ └────────┬─────────┘ └────────┬─────────┘
+   │                    │                    │
+   └──────────┬─────────┴─────────┬──────────┘
+        │                   │
+        ▼                   ▼
+
+  ┌─────────────────────┐   ┌─────────────────────┐
+  │     MongoDB Atlas   │   │    Gemini AI API    │
+  ├─────────────────────┤   ├─────────────────────┤
+  │ users               │   │ Resume Analysis     │
+  │ interviews          │   │ Question Generation │
+  │ reports             │   │ Feedback Generation │
+  │ mock_sessions       │   │ Report Synthesis    │
+  │ blacklisted_tokens  │   │ Resume Tailoring    │
+  └─────────────────────┘   └─────────────────────┘
+```
 
 ---
 
