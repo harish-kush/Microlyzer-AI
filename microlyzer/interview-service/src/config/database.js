@@ -1,7 +1,5 @@
 const mongoose = require("mongoose")
 
-
-
 async function connectToDB() {
     const mongoUri = process.env.MONGODB_URI || process.env.MONGO_URI
 

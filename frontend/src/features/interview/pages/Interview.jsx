@@ -6,8 +6,6 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { useNavigate } from 'react-router';
 
 
-
-
 const NAV_ITEMS = [
     {
         id: 'technical', label: 'Technical Questions', icon: (
