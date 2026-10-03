@@ -6,6 +6,8 @@ const ai = new GoogleGenAI({
   apiKey: process.env.GOOGLE_GENAI_API_KEY,
 });
 
+const MOCK_INTERVIEW_BRIEF = `You are an expert Software Engineering Interview Assistant helping a final-year B.Tech candidate prepare for Software Engineer and SDE roles. Be accurate, practical, concise, and easy for a fresher to understand. Use only the role and job description supplied. Do not invent candidate experience, achievements, or project details. Prefer questions and feedback that reveal engineering thinking: clear reasoning, practical examples, trade-offs, and correct fundamentals.`;
+
 const questionSchema = z.object({
   questions: z.array(z.string().min(1)).min(1).max(20),
 });
@@ -26,7 +28,14 @@ const summarySchema = z.object({
 });
 
 async function generateMockInterviewQuestions({ role, jobDescription }) {
-  const prompt = `Generate 10 interview questions for the following role and job description. Return ONLY valid JSON in the format: {\n  "questions": ["Question 1", "Question 2", ...]\n}\nRole: ${role}\nJob Description: ${jobDescription}`;
+  const prompt = `${MOCK_INTERVIEW_BRIEF}
+
+Generate 10 varied interview questions for this role. Balance technical fundamentals, practical project discussion, behavioral questions, and role-relevant problem-solving. Do not ask duplicate or vague questions.
+
+Role: ${role}
+Job Description: ${jobDescription}
+
+Return ONLY valid JSON in the format: {\n  "questions": ["Question 1", "Question 2", ...]\n}`;
 
   const response = await ai.models.generateContent({
     model: "gemini-3-flash-preview",
@@ -41,7 +50,10 @@ async function generateMockInterviewQuestions({ role, jobDescription }) {
 }
 
 async function evaluateMockInterviewAnswer({ question, answer }) {
-  const prompt = `You are a senior interviewer. Evaluate the candidate answer.
+  const prompt = `${MOCK_INTERVIEW_BRIEF}
+
+Act as a fair senior interviewer. Evaluate the candidate answer against the question. Give specific, constructive feedback: identify what was clear or correct, what is missing or inaccurate, and one practical way to improve the next answer. Do not claim the candidate has experience not stated in their answer. Score the answer, not the candidate as a person.
+
 Question:
 ${question}
 
@@ -53,7 +65,7 @@ Return ONLY valid JSON:
   "technical": 8,
   "communication": 7,
   "confidence": 6,
-  "feedback": "Detailed feedback..."
+  "feedback": "Specific, concise feedback with an improvement suggestion."
 }`;
 
   const response = await ai.models.generateContent({
@@ -79,7 +91,9 @@ async function generateMockInterviewSummary({
     })
     .join("\n\n");
 
-  const prompt = `Based on the full interview session below, generate a JSON object containing strengths, weaknesses, improvementAreas, roadmap, and analytics.
+  const prompt = `${MOCK_INTERVIEW_BRIEF}
+
+Based only on the full interview session below, generate a concise, evidence-based JSON object containing strengths, weaknesses, improvementAreas, roadmap, and analytics. Refer to patterns in the submitted answers, not invented background. Make the roadmap actionable and role-relevant.
 
 Role: ${role}
 Job Description: ${jobDescription}

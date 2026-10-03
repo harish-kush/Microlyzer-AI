@@ -2,10 +2,27 @@ const { GoogleGenAI } = require("@google/genai");
 const { z } = require("zod");
 const { zodToJsonSchema } = require("zod-to-json-schema");
 const puppeteer = require("puppeteer");
+const { PDFParse } = require("pdf-parse");
 
 const ai = new GoogleGenAI({
   apiKey: process.env.GOOGLE_GENAI_API_KEY,
 });
+
+const INTERVIEW_ASSISTANT_BRIEF = `You are an expert Software Engineering Interview Assistant for a final-year B.Tech candidate applying for Software Engineer and SDE roles.
+
+Use only details from the candidate material and job description supplied in this request. Do not invent employers, projects, ownership, technical decisions, achievements, metrics, responsibilities, or experience. If a detail is not supported by the material, keep the answer general and clearly avoid presenting it as the candidate's experience.
+
+Write concise, natural, interview-ready answers that a fresher can confidently say aloud in roughly 30–90 seconds. Avoid buzzwords and generic claims. Make every answer practical and demonstrate engineering thinking through a relevant trade-off, real-world consideration, or decision when the supplied material supports it.
+
+For behavioral questions, use a natural STAR flow where relevant: situation, task, action, and result. Focus on ownership, collaboration, challenges, and decisions. Do not invent measurable outcomes.
+
+For technical questions, begin with a simple accurate definition, explain it intuitively, give a practical development example, and briefly cover trade-offs or when to use the approach. For DSA questions, cover approach, why it works, time complexity, space complexity, and important edge cases. For system design questions, cover scalability, reliability, database choice, caching, communication, and trade-offs when relevant.`;
+
+const ONE_PAGE_RESUME_BRIEF = `Create a truthful, ATS-friendly, one-page Software Engineer resume for a final-year B.Tech candidate. Use only facts in the supplied candidate material; never fabricate metrics, technologies, projects, achievements, or employment. Tailor the content to the job description by prioritizing genuinely relevant skills and projects, without keyword stuffing.
+
+Use concise action-led bullets and a clean hierarchy: contact information, education, technical skills, projects, experience or internships if present, and only relevant achievements or leadership. Prioritize technical impact, architecture, difficult engineering problems, and genuine outcomes. Remove weak or redundant content before reducing readability.
+
+The generated HTML must render on exactly one A4 page. Use semantic HTML with simple headings and lists; do not use tables, icons, images, columns, graphics, or decorative elements. Include self-contained CSS using an A4 page, modest margins, 10–11pt body text, 13–16pt headings, compact but readable spacing, black or near-black text, and page-break avoidance. Do not include more than one page of content.`;
 
 const interviewReportSchema = z.object({
   matchScore: z
@@ -200,7 +217,20 @@ async function generateInterviewReport({
   selfDescription,
   jobDescription,
 }) {
-  const prompt = `Generate an interview report for a candidate with the following details:\nResume: ${resume}\nSelf Description: ${selfDescription}\nJob Description: ${jobDescription}\n\nReturn a single JSON object with the fields: title, matchScore, technicalQuestions, behavioralQuestions, skillGaps, and preparationPlan. Do not wrap the response in an array and do not include any extra explanation outside the JSON.`;
+  const prompt = `${INTERVIEW_ASSISTANT_BRIEF}
+
+Generate a tailored interview preparation report. Base the match score, questions, skill gaps, and preparation plan only on the supplied candidate material and job description. Keep question answers concise and spoken-answer ready. Include a natural practical consideration or trade-off when it is relevant and supported; do not force one.
+
+Candidate resume:
+${resume}
+
+Candidate self-description:
+${selfDescription}
+
+Target job description:
+${jobDescription}
+
+Return a single JSON object with the fields: title, matchScore, technicalQuestions, behavioralQuestions, skillGaps, and preparationPlan. Do not wrap the response in an array and do not include any extra explanation outside the JSON.`;
 
   const response = await ai.models.generateContent({
     model: "gemini-3-flash-preview",
@@ -239,6 +269,17 @@ async function generatePdfFromHtml(htmlContent) {
   return pdfBuffer;
 }
 
+async function getPdfPageCount(pdfBuffer) {
+  const parser = new PDFParse({ data: Uint8Array.from(pdfBuffer) });
+
+  try {
+    const info = await parser.getInfo();
+    return info.total;
+  } finally {
+    await parser.destroy();
+  }
+}
+
 async function generateResumePdf({ resume, selfDescription, jobDescription }) {
   const resumePdfSchema = z.object({
     html: z
@@ -248,33 +289,43 @@ async function generateResumePdf({ resume, selfDescription, jobDescription }) {
       ),
   });
 
-  const prompt = `Generate resume for a candidate with the following details:
-                        Resume: ${resume}
-                        Self Description: ${selfDescription}
-                        Job Description: ${jobDescription}
+  for (let attempt = 0; attempt < 2; attempt += 1) {
+    const retryInstruction = attempt
+      ? "The previous draft exceeded one page. Remove lower-priority content and tighten spacing while keeping the text readable; do not reduce the body font below 10pt."
+      : "";
+    const prompt = `${ONE_PAGE_RESUME_BRIEF}
 
-                        the response should be a JSON object with a single field "html" which contains the HTML content of the resume which can be converted to PDF using any library like puppeteer.
-                        The resume should be tailored for the given job description and should highlight the candidate's strengths and relevant experience. The HTML content should be well-formatted and structured, making it easy to read and visually appealing.
-                        The content of resume should be not sound like it's generated by AI and should be as close as possible to a real human-written resume.
-                        you can highlight the content using some colors or different font styles but the overall design should be simple and professional.
-                        The content should be ATS friendly, i.e. it should be easily parsable by ATS systems without losing important information.
-                        The resume should not be so lengthy, it should ideally be 1-2 pages long when converted to PDF. Focus on quality rather than quantity and make sure to include all the relevant information that can increase the candidate's chances of getting an interview call for the given job description.
-                    `;
+${retryInstruction}
 
-  const response = await ai.models.generateContent({
-    model: "gemini-3-flash-preview",
-    contents: prompt,
-    config: {
-      responseMimeType: "application/json",
-      responseSchema: zodToJsonSchema(resumePdfSchema),
-    },
-  });
+Candidate resume/source material:
+${resume}
 
-  const jsonContent = JSON.parse(response.text);
+Candidate self-description:
+${selfDescription}
 
-  const pdfBuffer = await generatePdfFromHtml(jsonContent.html);
+Target job description:
+${jobDescription}
 
-  return pdfBuffer;
+Return a JSON object with exactly one field, "html". Its value must be a complete HTML document that Puppeteer can render directly. Return no markdown and no text outside the JSON object.`;
+
+    const response = await ai.models.generateContent({
+      model: "gemini-3-flash-preview",
+      contents: prompt,
+      config: {
+        responseMimeType: "application/json",
+        responseSchema: zodToJsonSchema(resumePdfSchema),
+      },
+    });
+
+    const jsonContent = resumePdfSchema.parse(JSON.parse(response.text));
+    const pdfBuffer = await generatePdfFromHtml(jsonContent.html);
+
+    if ((await getPdfPageCount(pdfBuffer)) === 1) {
+      return pdfBuffer;
+    }
+  }
+
+  throw new Error("Unable to generate a readable one-page resume. Please try again.");
 }
 
 module.exports = {
